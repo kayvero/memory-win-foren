@@ -1,445 +1,132 @@
-# Volatility 3 Windows Commands --- Cheat Sheet
+# Volatility 3 Windows Commands — Cheat Sheet
 
-> Format: **Command \| Deskripsi \| Cara penggunaan**
+> Format: **Command | Deskripsi | Cara penggunaan**
 >
-> Basis daftar command: command list yang terlihat pada screenshot
-> Volatility 3 yang diberikan.\
-> Contoh penggunaan menggunakan pola Volatility 3 CLI yang umum. Jika
-> suatu plugin tidak menerima opsi tertentu pada versi Volatility yang
-> dipakai, cek `--help`.
+> Basis daftar command: command list yang terlihat pada screenshot Volatility 3 yang diberikan.
+> Contoh penggunaan menggunakan pola Volatility 3 CLI yang umum. Jika suatu plugin tidak menerima opsi tertentu pada versi Volatility yang dipakai, cek `--help`.
 
 ## Cara baca sintaks
 
-  -----------------------------------------------------------------------
-  Sintaks                             Fungsi
-  ----------------------------------- -----------------------------------
-  `-f <file>`                         Menentukan memory dump yang
-                                      dianalisis
-
-  `--pid <PID>`                       Membatasi analisis ke process ID
-                                      tertentu, jika plugin mendukungnya
-
-  `| grep <kata>`                     Menyaring output berdasarkan teks
-
-  `grep -i <kata>`                    `grep` tanpa membedakan huruf
-                                      besar/kecil
-
-  `-h` / `--help`                     Melihat opsi yang tersedia untuk
-                                      plugin
-
-  `-q`                                Quiet mode pada command
-                                      tertentu/versi tertentu; jangan
-                                      diasumsikan tersedia pada semua
-                                      plugin
-
-  `-r <regex>`                        Regex pada plugin yang mendukung
-                                      pencarian/filter regex
-  -----------------------------------------------------------------------
+| Sintaks | Fungsi |
+| --- | --- |
+| `-f <file>` | Menentukan memory dump yang dianalisis |
+| `--pid <PID>` | Membatasi analisis ke process ID tertentu, jika plugin mendukungnya |
+| `\| grep <kata>` | Menyaring output berdasarkan teks |
+| `grep -i <kata>` | `grep` tanpa membedakan huruf besar/kecil |
+| `-h` / `--help` | Melihat opsi yang tersedia untuk plugin |
+| `-q` | Quiet mode pada command tertentu/versi tertentu; jangan diasumsikan tersedia pada semua plugin |
+| `-r <regex>` | Regex pada plugin yang mendukung pencarian/filter regex |
 
 ## Command dasar
 
-  -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-  Command                                   Deskripsi                    Cara penggunaan
-  ----------------------------------------- ---------------------------- ------------------------------------------------------------------------------------------
-  `windows.bigpools`                        Menampilkan informasi Big    Dasar: `vol -f Memory.raw windows.bigpools``<br>`{=html}Filter output:
-                                            Pool/kernel pool yang        `vol -f Memory.raw windows.bigpools \| grep -i "kata"`
-                                            ditemukan di memory. Berguna 
-                                            untuk investigasi            
-                                            objek/alokasi kernel         
-                                            tertentu.                    
-
-  `windows.callbacks`                       Menampilkan callback kernel  Dasar: `vol -f Memory.raw windows.callbacks``<br>`{=html}Filter:
-                                            yang terdaftar. Berguna      `vol -f Memory.raw windows.callbacks \| grep -i "kata"`
-                                            untuk mencari callback yang  
-                                            tidak biasa.                 
-
-  `windows.cmdline`                         Menampilkan command line     Dasar: `vol -f Memory.raw windows.cmdline``<br>`{=html}PID:
-                                            proses. Berguna untuk        `vol -f Memory.raw windows.cmdline --pid 880``<br>`{=html}Filter:
-                                            mengetahui argumen yang      `vol -f Memory.raw windows.cmdline \| grep -i "powershell"`
-                                            digunakan saat proses        
-                                            dijalankan.                  
-
-  `windows.cmdscan`                         Mencari command yang         Dasar: `vol -f Memory.raw windows.cmdscan``<br>`{=html}Filter:
-                                            tersimpan di console command `vol -f Memory.raw windows.cmdscan \| grep -i "cmd"`
-                                            history/buffer Windows.      
-
-  `windows.consoles`                        Menampilkan informasi        Dasar: `vol -f Memory.raw windows.consoles``<br>`{=html}Filter:
-                                            console Windows dan command  `vol -f Memory.raw windows.consoles \| grep -i "whoami"`
-                                            yang berhubungan dengannya.  
-
-  `windows.crashinfo`                       Menampilkan informasi yang   `vol -f Memory.raw windows.crashinfo`
-                                            berkaitan dengan crash       
-                                            dump/header crash            
-                                            information jika tersedia.   
-
-  `windows.debugregisters`                  Menampilkan debug registers  Dasar: `vol -f Memory.raw windows.debugregisters``<br>`{=html}Filter:
-                                            proses/thread yang ditemukan `vol -f Memory.raw windows.debugregisters \| grep -i "PID"`
-                                            di memory.                   
-
-  `windows.deskscan`                        Melakukan scan terhadap      `vol -f Memory.raw windows.deskscan`
-                                            objek desktop Windows.       
-
-  `windows.desktops`                        Menampilkan objek            `vol -f Memory.raw windows.desktops`
-                                            desktop/window-station yang  
-                                            ditemukan.                   
-
-  `windows.devicetree`                      Menampilkan device tree      `vol -f Memory.raw windows.devicetree`
-                                            Windows dan hubungan objek   
-                                            device.                      
-
-  `windows.dlllist`                         Menampilkan DLL/module yang  Dasar: `vol -f Memory.raw windows.dlllist``<br>`{=html}PID:
-                                            terhubung dengan proses      `vol -f Memory.raw windows.dlllist --pid 880``<br>`{=html}Filter:
-                                            melalui struktur loader.     `vol -f Memory.raw windows.dlllist --pid 880 \| grep -i "dll"`
-
-  `windows.driverirp`                       Menampilkan informasi        `vol -f Memory.raw windows.driverirp``<br>`{=html}Filter:
-                                            IRP/function table pada      `vol -f Memory.raw windows.driverirp \| grep -i "driver"`
-                                            driver. Berguna dalam        
-                                            analisis driver/kernel.      
-
-  `windows.driverscan`                      Melakukan scan memory untuk  `vol -f Memory.raw windows.driverscan``<br>`{=html}Filter:
-                                            menemukan objek driver.      `vol -f Memory.raw windows.driverscan \| grep -i "sys"`
-
-  `windows.dumpfiles`                       Mengekstrak file/cache       Dasar: `vol -f Memory.raw windows.dumpfiles``<br>`{=html}Output directory:
-                                            object yang ditemukan dari   `vol -f Memory.raw windows.dumpfiles -D dumped_files/``<br>`{=html}Filter output:
-                                            memory.                      `vol -f Memory.raw windows.dumpfiles \| grep -i ".exe"`
-
-  `windows.envars`                          Menampilkan environment      Dasar: `vol -f Memory.raw windows.envars``<br>`{=html}PID:
-                                            variables proses.            `vol -f Memory.raw windows.envars --pid 880``<br>`{=html}Filter:
-                                                                         `vol -f Memory.raw windows.envars \| grep -i "PATH"`
-
-  `windows.etwpatch`                        Memeriksa                    `vol -f Memory.raw windows.etwpatch`
-                                            informasi/indikator patching 
-                                            pada ETW (Event Tracing for  
-                                            Windows).                    
-
-  `windows.filescan`                        Melakukan scan memory untuk  `vol -f Memory.raw windows.filescan``<br>`{=html}Filter:
-                                            menemukan objek file         `vol -f Memory.raw windows.filescan \| grep -i "str.sys"`
-                                            `_FILE_OBJECT`.              
-
-  `windows.getservicesids`                  Menampilkan pemetaan Service `vol -f Memory.raw windows.getservicesids`
-                                            SID yang dapat ditemukan     
-                                            dari konfigurasi/registry    
-                                            terkait service.             
-
-  `windows.getsids`                         Menampilkan SID yang terkait Dasar: `vol -f Memory.raw windows.getsids``<br>`{=html}PID:
-                                            dengan proses/token.         `vol -f Memory.raw windows.getsids --pid 880`
-
-  `windows.handles`                         Menampilkan handle yang      Dasar: `vol -f Memory.raw windows.handles``<br>`{=html}PID:
-                                            dimiliki proses ke object    `vol -f Memory.raw windows.handles --pid 880``<br>`{=html}Filter teks:
-                                            kernel seperti file,         `vol -f Memory.raw windows.handles --pid 880 \| grep -i "str.sys"`
-                                            registry, process, thread,   
-                                            event, dan lainnya.          
-
-  `windows.iat`                             Menganalisis Import Address  `vol -f Memory.raw windows.iat`
-                                            Table (IAT) dari             
-                                            executable/module yang       
-                                            ditemukan.                   
-
-  `windows.info`                            Menampilkan informasi dasar  `vol -f Memory.raw windows.info`
-                                            OS/kernel dari memory dump,  
-                                            seperti versi Windows dan    
-                                            build.                       
-
-  `windows.joblinks`                        Menampilkan hubungan job     `vol -f Memory.raw windows.joblinks`
-                                            object dengan proses yang    
-                                            terkait.                     
-
-  `windows.kpcrs`                           Menampilkan Kernel Processor `vol -f Memory.raw windows.kpcrs`
-                                            Control Region (KPCR) yang   
-                                            ditemukan.                   
-
-  `windows.malware.direct_system_calls`     Mencari indikasi direct      `vol -f Memory.raw windows.malware.direct_system_calls``<br>`{=html}Jika plugin mendukung
-                                            system calls pada            PID: `... --pid 880`
-                                            proses/module sebagai bagian 
-                                            dari analisis malware.       
-
-  `windows.malware.drivermodule`            Menghubungkan/menganalisis   `vol -f Memory.raw windows.malware.drivermodule`
-                                            module driver yang ditemukan 
-                                            pada memory.                 
-
-  `windows.malware.hollowprocesses`         Mencari indikasi process     `vol -f Memory.raw windows.malware.hollowprocesses`
-                                            hollowing.                   
-
-  `windows.malware.indirect_system_calls`   Mencari indikasi indirect    `vol -f Memory.raw windows.malware.indirect_system_calls`
-                                            system calls yang dapat      
-                                            digunakan malware untuk      
-                                            menghindari pola API biasa.  
-
-  `windows.malware.ldrmodules`              Membandingkan daftar module  Dasar: `vol -f Memory.raw windows.malware.ldrmodules``<br>`{=html}PID:
-                                            dari beberapa linked list    `vol -f Memory.raw windows.malware.ldrmodules --pid 880``<br>`{=html}Filter:
-                                            loader untuk menemukan       `vol -f Memory.raw windows.malware.ldrmodules --pid 880 \| grep -i "False"`
-                                            module yang tidak            
-                                            terhubung/unlinked. Sangat   
-                                            berguna untuk indikasi DLL   
-                                            hiding.                      
-
-  `windows.malware.malfind`                 Mencari region memory yang   Dasar: `vol -f Memory.raw windows.malware.malfind``<br>`{=html}PID:
-                                            mencurigakan, misalnya       `vol -f Memory.raw windows.malware.malfind --pid 880`
-                                            indikasi code injection.     
-
-  `windows.malware.pebmasquerade`           Mencari indikasi             `vol -f Memory.raw windows.malware.pebmasquerade`
-                                            manipulasi/masquerading      
-                                            terhadap Process Environment 
-                                            Block (PEB).                 
-
-  `windows.malware.processghosting`         Mencari indikasi Process     `vol -f Memory.raw windows.malware.processghosting`
-                                            Ghosting.                    
-
-  `windows.malware.psxview`                 Membandingkan beberapa       Dasar: `vol -f Memory.raw windows.malware.psxview``<br>`{=html}Filter:
-                                            sumber enumerasi proses      `vol -f Memory.raw windows.malware.psxview \| grep -i "False"`
-                                            untuk menemukan proses yang  
-                                            mungkin disembunyikan.       
-
-  `windows.malware.skeleton_key_check`      Memeriksa indikator teknik   `vol -f Memory.raw windows.malware.skeleton_key_check`
-                                            Skeleton Key pada Active     
-                                            Directory/domain             
-                                            environment.                 
-
-  `windows.malware.suspicious_threads`      Mencari thread yang memiliki `vol -f Memory.raw windows.malware.suspicious_threads``<br>`{=html}Jika mendukung PID:
-                                            karakteristik mencurigakan.  `... --pid 880`
-
-  `windows.malware.svcdiff`                 Membandingkan informasi      `vol -f Memory.raw windows.malware.svcdiff`
-                                            service untuk menemukan      
-                                            perbedaan/anomali.           
-
-  `windows.malware.unhooked_system_calls`   Mencari system call/API yang `vol -f Memory.raw windows.malware.unhooked_system_calls`
-                                            tampak tidak ter-hook atau   
-                                            memiliki indikasi anomali.   
-
-  `windows.mbrscan`                         Melakukan scan untuk Master  `vol -f Memory.raw windows.mbrscan`
-                                            Boot Record (MBR)            
-                                            signature/struktur yang      
-                                            ditemukan dalam memory.      
-
-  `windows.memmap`                          Menampilkan pemetaan virtual Dasar: `vol -f Memory.raw windows.memmap --pid 880``<br>`{=html}Filter:
-                                            address ke memory/physical   `vol -f Memory.raw windows.memmap --pid 880 \| grep -i "980000"`
-                                            mapping untuk suatu proses.  
-                                            Berguna untuk memahami       
-                                            region memory proses.        
-
-  `windows.mftscan.ADS`                     Mencari Alternate Data       `vol -f Memory.raw windows.mftscan.ADS`
-                                            Streams (ADS) dari struktur  
-                                            NTFS/MFT yang ditemukan.     
-
-  `windows.mftscan.MFTScan`                 Melakukan scan untuk         `vol -f Memory.raw windows.mftscan.MFTScan``<br>`{=html}Filter:
-                                            struktur Master File Table   `vol -f Memory.raw windows.mftscan.MFTScan \| grep -i ".exe"`
-                                            (MFT) NTFS.                  
-
-  `windows.mftscan.ResidentData`            Mencari data resident yang   `vol -f Memory.raw windows.mftscan.ResidentData`
-                                            tersimpan langsung di record 
-                                            MFT.                         
-
-  `windows.modscan`                         Melakukan scan memory untuk  `vol -f Memory.raw windows.modscan``<br>`{=html}Filter:
-                                            menemukan kernel modules.    `vol -f Memory.raw windows.modscan \| grep -i ".sys"`
-
-  `windows.modules`                         Menampilkan kernel modules   `vol -f Memory.raw windows.modules``<br>`{=html}Filter:
-                                            yang terdaftar/ditemukan.    `vol -f Memory.raw windows.modules \| grep -i "driver"`
-
-  `windows.mutantscan`                      Melakukan scan untuk         `vol -f Memory.raw windows.mutantscan``<br>`{=html}Filter:
-                                            mutant/mutex objects         `vol -f Memory.raw windows.mutantscan \| grep -i "mutex"`
-                                            Windows. Berguna untuk       
-                                            menemukan mutex yang mungkin 
-                                            berkaitan dengan malware.    
-
-  `windows.netscan`                         Mencari network              Dasar: `vol -f Memory.raw windows.netscan``<br>`{=html}Filter:
-                                            connection/socket artifacts  `vol -f Memory.raw windows.netscan \| grep -i "ESTABLISHED"``<br>`{=html}Filter PID:
-                                            dari memory.                 `vol -f Memory.raw windows.netscan \| grep "880"`
-
-  `windows.netstat`                         Menampilkan informasi        `vol -f Memory.raw windows.netstat``<br>`{=html}Filter:
-                                            network state yang dapat     `vol -f Memory.raw windows.netstat \| grep -i "ESTABLISHED"`
-                                            direkonstruksi dari memory.  
-
-  `windows.orphan_kernel_threads`           Mencari kernel thread yang   `vol -f Memory.raw windows.orphan_kernel_threads`
-                                            tampak orphan/tidak memiliki 
-                                            hubungan normal.             
-
-  `windows.pe_symbols`                      Menampilkan/menganalisis PE  `vol -f Memory.raw windows.pe_symbols`
-                                            symbols yang tersedia untuk  
-                                            executable/module.           
-
-  `windows.pedump`                          Mengekstrak PE image/module  Dasar: `vol -f Memory.raw windows.pedump``<br>`{=html}Output directory:
-                                            dari memory. Berguna untuk   `vol -f Memory.raw windows.pedump -D dumped_pe/`
-                                            mengambil executable/DLL     
-                                            untuk analisis lanjutan.     
-
-  `windows.poolscanner`                     Melakukan pool scan untuk    `vol -f Memory.raw windows.poolscanner``<br>`{=html}Filter:
-                                            menemukan objek kernel       `vol -f Memory.raw windows.poolscanner \| grep -i "Process"`
-                                            berdasarkan pool             
-                                            tag/signature.               
-
-  `windows.privileges`                      Menampilkan privilege/token  Dasar: `vol -f Memory.raw windows.privileges``<br>`{=html}PID:
-                                            privilege yang dimiliki      `vol -f Memory.raw windows.privileges --pid 880`
-                                            proses.                      
-
-  `windows.pslist`                          Menampilkan proses yang      Dasar: `vol -f Memory.raw windows.pslist``<br>`{=html}Filter:
-                                            terdaftar dalam process list `vol -f Memory.raw windows.pslist \| grep -i "svchost"`
-                                            Windows.                     
-
-  `windows.psscan`                          Melakukan scan memory untuk  `vol -f Memory.raw windows.psscan``<br>`{=html}Filter:
-                                            menemukan process objects,   `vol -f Memory.raw windows.psscan \| grep -i "rootkit"`
-                                            termasuk proses yang mungkin 
-                                            sudah keluar/tersembunyi     
-                                            dari list normal.            
-
-  `windows.pstree`                          Menampilkan hubungan         Dasar: `vol -f Memory.raw windows.pstree``<br>`{=html}Filter:
-                                            parent-child antar proses    `vol -f Memory.raw windows.pstree \| grep -i "cmd"`
-                                            dalam bentuk tree.           
-
-  `windows.registry.amcache`                Menganalisis AmCache dari    `vol -f Memory.raw windows.registry.amcache``<br>`{=html}Filter:
-                                            registry untuk artefact      `vol -f Memory.raw windows.registry.amcache \| grep -i ".exe"`
-                                            aplikasi/executable.         
-
-  `windows.registry.cachedump`              Mengambil cached domain      `vol -f Memory.raw windows.registry.cachedump`
-                                            logon information dari       
-                                            registry memory artefacts.   
-
-  `windows.registry.certificates`           Menampilkan certificate      `vol -f Memory.raw windows.registry.certificates`
-                                            information yang ditemukan   
-                                            pada registry.               
-
-  `windows.registry.getcellroutine`         Menampilkan/menelusuri cell  `vol -f Memory.raw windows.registry.getcellroutine`
-                                            routine pada registry hive   
-                                            structures.                  
-
-  `windows.registry.hashdump`               Mengekstrak password hash    `vol -f Memory.raw windows.registry.hashdump`
-                                            dari registry SAM/SYSTEM     
-                                            bila artefact yang           
-                                            dibutuhkan tersedia.         
-
-  `windows.registry.hivelist`               Menampilkan registry hive    `vol -f Memory.raw windows.registry.hivelist`
-                                            yang ditemukan dalam memory. 
-
-  `windows.registry.hivescan`               Melakukan scan memory untuk  `vol -f Memory.raw windows.registry.hivescan`
-                                            menemukan registry hive      
-                                            structures.                  
-
-  `windows.registry.lsadump`                Mengekstrak informasi LSA    `vol -f Memory.raw windows.registry.lsadump`
-                                            secrets dari registry/memory 
-                                            artefacts.                   
-
-  `windows.registry.printkey`               Membaca registry key/value   Dasar: `vol -f Memory.raw windows.registry.printkey``<br>`{=html}Untuk key tertentu
-                                            tertentu.                    gunakan opsi path/key yang tersedia pada `vol ... windows.registry.printkey --help`
-
-  `windows.registry.scheduled_tasks`        Menganalisis scheduled task  `vol -f Memory.raw windows.registry.scheduled_tasks``<br>`{=html}Filter:
-                                            yang tersimpan pada          `vol -f Memory.raw windows.registry.scheduled_tasks \| grep -i "task"`
-                                            registry.                    
-
-  `windows.registry.userassist`             Menampilkan UserAssist       Dasar: `vol -f Memory.raw windows.registry.userassist``<br>`{=html}Filter:
-                                            artefacts yang dapat         `vol -f Memory.raw windows.registry.userassist \| grep -i "Brave"`
-                                            menunjukkan aktivitas        
-                                            aplikasi melalui registry.   
-
-  `windows.sessions`                        Menampilkan session Windows  `vol -f Memory.raw windows.sessions`
-                                            yang ditemukan.              
-
-  `windows.shimcachemem`                    Menganalisis                 `vol -f Memory.raw windows.shimcachemem``<br>`{=html}Filter:
-                                            ShimCache/AppCompatCache     `vol -f Memory.raw windows.shimcachemem \| grep -i ".exe"`
-                                            data yang berada di memory.  
-
-  `windows.ssdtscan`                        Melakukan scan terhadap      `vol -f Memory.raw windows.ssdtscan`
-                                            System Service Descriptor    
-                                            Table (SSDT).                
-
-  `windows.statistics`                      Menampilkan statistik        `vol -f Memory.raw windows.statistics`
-                                            tertentu yang dapat          
-                                            dikumpulkan dari             
-                                            memory/kernel structures.    
-
-  `windows.strings`                         Mencari/memetakan string ke  Dasar: `vol -f Memory.raw windows.strings --strings-file strings.txt` jika opsi tersebut
-                                            virtual address/process      tersedia pada versi plugin.`<br>`{=html}Selalu cek: `vol ... windows.strings --help`
-                                            context. Berguna untuk       
-                                            menemukan URL, path,         
-                                            command, atau IOC.           
-
-  `windows.suspended_threads`               Menampilkan thread yang      `vol -f Memory.raw windows.suspended_threads`
-                                            berada dalam kondisi         
-                                            suspended.                   
-
-  `windows.svclist`                         Menampilkan Windows services `vol -f Memory.raw windows.svclist``<br>`{=html}Filter:
-                                            yang ditemukan.              `vol -f Memory.raw windows.svclist \| grep -i "service"`
-
-  `windows.svcscan`                         Melakukan scan memory untuk  `vol -f Memory.raw windows.svcscan``<br>`{=html}Filter:
-                                            menemukan Windows services,  `vol -f Memory.raw windows.svcscan \| grep -i "svchost"`
-                                            termasuk artefact service    
-                                            yang mungkin tidak muncul    
-                                            dari enumerasi normal.       
-
-  `windows.symlinkscan`                     Melakukan scan untuk         `vol -f Memory.raw windows.symlinkscan``<br>`{=html}Filter:
-                                            symbolic link objects        `vol -f Memory.raw windows.symlinkscan \| grep -i "link"`
-                                            Windows.                     
-
-  `windows.thrdscan`                        Melakukan scan memory untuk  `vol -f Memory.raw windows.thrdscan``<br>`{=html}Filter:
-                                            menemukan thread objects.    `vol -f Memory.raw windows.thrdscan \| grep "880"`
-
-  `windows.threads`                         Menampilkan thread yang      Dasar: `vol -f Memory.raw windows.threads``<br>`{=html}PID:
-                                            terkait dengan proses.       `vol -f Memory.raw windows.threads --pid 880`
-
-  `windows.timers`                          Menampilkan kernel timers    `vol -f Memory.raw windows.timers`
-                                            yang ditemukan. Berguna      
-                                            untuk investigasi aktivitas  
-                                            kernel tertentu.             
-
-  `windows.timedump`                        Menampilkan                  `vol -f Memory.raw windows.timedump`
-                                            timestamp/time-related dump  
-                                            information jika tersedia    
-                                            pada plugin/version yang     
-                                            digunakan.                   
-
-  `windows.unloadedmodules`                 Menampilkan module yang      `vol -f Memory.raw windows.unloadedmodules``<br>`{=html}Filter:
-                                            sudah di-unload tetapi       `vol -f Memory.raw windows.unloadedmodules \| grep -i ".sys"`
-                                            artefact-nya masih dapat     
-                                            ditemukan. Berguna untuk     
-                                            investigasi module yang      
-                                            pernah aktif.                
-
-  `windows.vadinfo`                         Menampilkan Virtual Address  Dasar: `vol -f Memory.raw windows.vadinfo --pid 880``<br>`{=html}Filter:
-                                            Descriptor (VAD) dan region  `vol -f Memory.raw windows.vadinfo --pid 880 \| grep -i "PAGE_EXECUTE"`
-                                            virtual memory milik proses. 
-
-  `windows.vadregexscan`                    Mencari pola/regex pada VAD  Cek opsi dulu: `vol -f Memory.raw windows.vadregexscan --help``<br>`{=html}Lalu gunakan
-                                            memory regions.              opsi regex/pattern yang disediakan versi plugin
-
-  `windows.vadwalk`                         Menelusuri struktur VAD tree `vol -f Memory.raw windows.vadwalk --pid 880`
-                                            suatu proses.                
-
-  `windows.vadyarascan`                     Melakukan YARA scan terhadap Dasar:
-                                            VAD memory regions.          `vol -f Memory.raw windows.vadyarascan --pid 880 --yara-rules rule.yar``<br>`{=html}Nama
-                                                                         opsi dapat berbeda menurut versi; cek `--help`
-
-  `windows.verinfo`                         Menampilkan version          `vol -f Memory.raw windows.verinfo`
-                                            information dari PE/module   
-                                            yang ditemukan.              
-
-  `windows.virtmap`                         Menampilkan virtual memory   `vol -f Memory.raw windows.virtmap`
-                                            mapping yang ditemukan.      
-
-  `windows.windows`                         Menampilkan window           `vol -f Memory.raw windows.windows`
-                                            objects/window information   
-                                            yang ditemukan pada Windows  
-                                            GUI subsystem.               
-
-  `windows.windowstations`                  Menampilkan Windows Window   `vol -f Memory.raw windows.windowstations`
-                                            Station objects dan          
-                                            informasi terkait.           
-  -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Command | Deskripsi | Cara penggunaan |
+| --- | --- | --- |
+| `windows.bigpools` | Menampilkan informasi Big Pool/kernel pool yang ditemukan di memory. Berguna untuk investigasi objek/alokasi kernel tertentu. | Dasar: `vol -f Memory.raw windows.bigpools`<br>Filter: `vol -f Memory.raw windows.bigpools \| grep -i "kata"` |
+| `windows.callbacks` | Menampilkan callback kernel yang terdaftar. Berguna untuk mencari callback yang tidak biasa. | Dasar: `vol -f Memory.raw windows.callbacks`<br>Filter: `vol -f Memory.raw windows.callbacks \| grep -i "kata"` |
+| `windows.cmdline` | Menampilkan command line proses. Berguna untuk mengetahui argumen yang digunakan saat proses dijalankan. | Dasar: `vol -f Memory.raw windows.cmdline`<br>PID: `vol -f Memory.raw windows.cmdline --pid 880`<br>Filter: `vol -f Memory.raw windows.cmdline \| grep -i "powershell"` |
+| `windows.cmdscan` | Mencari command yang tersimpan di console command history/buffer Windows. | Dasar: `vol -f Memory.raw windows.cmdscan`<br>Filter: `vol -f Memory.raw windows.cmdscan \| grep -i "cmd"` |
+| `windows.consoles` | Menampilkan informasi console Windows dan command yang berhubungan dengannya. | Dasar: `vol -f Memory.raw windows.consoles`<br>Filter: `vol -f Memory.raw windows.consoles \| grep -i "whoami"` |
+| `windows.crashinfo` | Menampilkan informasi yang berkaitan dengan crash dump/header crash information jika tersedia. | `vol -f Memory.raw windows.crashinfo` |
+| `windows.debugregisters` | Menampilkan debug registers proses/thread yang ditemukan di memory. | Dasar: `vol -f Memory.raw windows.debugregisters`<br>Filter: `vol -f Memory.raw windows.debugregisters \| grep -i "PID"` |
+| `windows.deskscan` | Melakukan scan terhadap objek desktop Windows. | `vol -f Memory.raw windows.deskscan` |
+| `windows.desktops` | Menampilkan objek desktop/window-station yang ditemukan. | `vol -f Memory.raw windows.desktops` |
+| `windows.devicetree` | Menampilkan device tree Windows dan hubungan objek device. | `vol -f Memory.raw windows.devicetree` |
+| `windows.dlllist` | Menampilkan DLL/module yang terhubung dengan proses melalui struktur loader. | Dasar: `vol -f Memory.raw windows.dlllist`<br>PID: `vol -f Memory.raw windows.dlllist --pid 880`<br>Filter: `vol -f Memory.raw windows.dlllist --pid 880 \| grep -i "dll"` |
+| `windows.driverirp` | Menampilkan informasi IRP/function table pada driver. Berguna dalam analisis driver/kernel. | `vol -f Memory.raw windows.driverirp`<br>Filter: `vol -f Memory.raw windows.driverirp \| grep -i "driver"` |
+| `windows.driverscan` | Melakukan scan memory untuk menemukan objek driver. | `vol -f Memory.raw windows.driverscan`<br>Filter: `vol -f Memory.raw windows.driverscan \| grep -i "sys"` |
+| `windows.dumpfiles` | Mengekstrak file/cache object yang ditemukan dari memory. | Dasar: `vol -f Memory.raw windows.dumpfiles`<br>Output directory: `vol -f Memory.raw windows.dumpfiles -D dumped_files/`<br>Filter output: `vol -f Memory.raw windows.dumpfiles \| grep -i ".exe"` |
+| `windows.envars` | Menampilkan environment variables proses. | Dasar: `vol -f Memory.raw windows.envars`<br>PID: `vol -f Memory.raw windows.envars --pid 880`<br>Filter: `vol -f Memory.raw windows.envars \| grep -i "PATH"` |
+| `windows.etwpatch` | Memeriksa informasi/indikator patching pada ETW (Event Tracing for Windows). | `vol -f Memory.raw windows.etwpatch` |
+| `windows.filescan` | Melakukan scan memory untuk menemukan objek file `_FILE_OBJECT`. | `vol -f Memory.raw windows.filescan`<br>Filter: `vol -f Memory.raw windows.filescan \| grep -i "str.sys"` |
+| `windows.getservicesids` | Menampilkan pemetaan Service SID yang dapat ditemukan dari konfigurasi/registry terkait service. | `vol -f Memory.raw windows.getservicesids` |
+| `windows.getsids` | Menampilkan SID yang terkait dengan proses/token. | Dasar: `vol -f Memory.raw windows.getsids`<br>PID: `vol -f Memory.raw windows.getsids --pid 880` |
+| `windows.handles` | Menampilkan handle yang dimiliki proses ke object kernel seperti file, registry, process, thread, event, dan lainnya. | Dasar: `vol -f Memory.raw windows.handles`<br>PID: `vol -f Memory.raw windows.handles --pid 880`<br>Filter teks: `vol -f Memory.raw windows.handles --pid 880 \| grep -i "str.sys"` |
+| `windows.iat` | Menganalisis Import Address Table (IAT) dari executable/module yang ditemukan. | `vol -f Memory.raw windows.iat` |
+| `windows.info` | Menampilkan informasi dasar OS/kernel dari memory dump, seperti versi Windows dan build. | `vol -f Memory.raw windows.info` |
+| `windows.joblinks` | Menampilkan hubungan job object dengan proses yang terkait. | `vol -f Memory.raw windows.joblinks` |
+| `windows.kpcrs` | Menampilkan Kernel Processor Control Region (KPCR) yang ditemukan. | `vol -f Memory.raw windows.kpcrs` |
+| `windows.malware.direct_system_calls` | Mencari indikasi direct system calls pada proses/module sebagai bagian dari analisis malware. | `vol -f Memory.raw windows.malware.direct_system_calls`<br>Jika plugin mendukung PID: `... --pid 880` |
+| `windows.malware.drivermodule` | Menghubungkan/menganalisis module driver yang ditemukan pada memory. | `vol -f Memory.raw windows.malware.drivermodule` |
+| `windows.malware.hollowprocesses` | Mencari indikasi process hollowing. | `vol -f Memory.raw windows.malware.hollowprocesses` |
+| `windows.malware.indirect_system_calls` | Mencari indikasi indirect system calls yang dapat digunakan malware untuk menghindari pola API biasa. | `vol -f Memory.raw windows.malware.indirect_system_calls` |
+| `windows.malware.ldrmodules` | Membandingkan daftar module dari beberapa linked list loader untuk menemukan module yang tidak terhubung/unlinked. Sangat berguna untuk indikasi DLL hiding. | Dasar: `vol -f Memory.raw windows.malware.ldrmodules`<br>PID: `vol -f Memory.raw windows.malware.ldrmodules --pid 880`<br>Filter: `vol -f Memory.raw windows.malware.ldrmodules --pid 880 \| grep -i "False"` |
+| `windows.malware.malfind` | Mencari region memory yang mencurigakan, misalnya indikasi code injection. | Dasar: `vol -f Memory.raw windows.malware.malfind`<br>PID: `vol -f Memory.raw windows.malware.malfind --pid 880` |
+| `windows.malware.pebmasquerade` | Mencari indikasi manipulasi/masquerading terhadap Process Environment Block (PEB). | `vol -f Memory.raw windows.malware.pebmasquerade` |
+| `windows.malware.processghosting` | Mencari indikasi Process Ghosting. | `vol -f Memory.raw windows.malware.processghosting` |
+| `windows.malware.psxview` | Membandingkan beberapa sumber enumerasi proses untuk menemukan proses yang mungkin disembunyikan. | Dasar: `vol -f Memory.raw windows.malware.psxview`<br>Filter: `vol -f Memory.raw windows.malware.psxview \| grep -i "False"` |
+| `windows.malware.skeleton_key_check` | Memeriksa indikator teknik Skeleton Key pada Active Directory/domain environment. | `vol -f Memory.raw windows.malware.skeleton_key_check` |
+| `windows.malware.suspicious_threads` | Mencari thread yang memiliki karakteristik mencurigakan. | `vol -f Memory.raw windows.malware.suspicious_threads`<br>Jika mendukung PID: `... --pid 880` |
+| `windows.malware.svcdiff` | Membandingkan informasi service untuk menemukan perbedaan/anomali. | `vol -f Memory.raw windows.malware.svcdiff` |
+| `windows.malware.unhooked_system_calls` | Mencari system call/API yang tampak tidak ter-hook atau memiliki indikasi anomali. | `vol -f Memory.raw windows.malware.unhooked_system_calls` |
+| `windows.mbrscan` | Melakukan scan untuk Master Boot Record (MBR) signature/struktur yang ditemukan dalam memory. | `vol -f Memory.raw windows.mbrscan` |
+| `windows.memmap` | Menampilkan pemetaan virtual address ke memory/physical mapping untuk suatu proses. Berguna untuk memahami region memory proses. | Dasar: `vol -f Memory.raw windows.memmap --pid 880`<br>Filter: `vol -f Memory.raw windows.memmap --pid 880 \| grep -i "980000"` |
+| `windows.mftscan.ADS` | Mencari Alternate Data Streams (ADS) dari struktur NTFS/MFT yang ditemukan. | `vol -f Memory.raw windows.mftscan.ADS` |
+| `windows.mftscan.MFTScan` | Melakukan scan untuk struktur Master File Table (MFT) NTFS. | `vol -f Memory.raw windows.mftscan.MFTScan`<br>Filter: `vol -f Memory.raw windows.mftscan.MFTScan \| grep -i ".exe"` |
+| `windows.mftscan.ResidentData` | Mencari data resident yang tersimpan langsung di record MFT. | `vol -f Memory.raw windows.mftscan.ResidentData` |
+| `windows.modscan` | Melakukan scan memory untuk menemukan kernel modules. | `vol -f Memory.raw windows.modscan`<br>Filter: `vol -f Memory.raw windows.modscan \| grep -i ".sys"` |
+| `windows.modules` | Menampilkan kernel modules yang terdaftar/ditemukan. | `vol -f Memory.raw windows.modules`<br>Filter: `vol -f Memory.raw windows.modules \| grep -i "driver"` |
+| `windows.mutantscan` | Melakukan scan untuk mutant/mutex objects Windows. Berguna untuk menemukan mutex yang mungkin berkaitan dengan malware. | `vol -f Memory.raw windows.mutantscan`<br>Filter: `vol -f Memory.raw windows.mutantscan \| grep -i "mutex"` |
+| `windows.netscan` | Mencari network connection/socket artifacts dari memory. | Dasar: `vol -f Memory.raw windows.netscan`<br>Filter: `vol -f Memory.raw windows.netscan \| grep -i "ESTABLISHED"`<br>Filter PID: `vol -f Memory.raw windows.netscan \| grep "880"` |
+| `windows.netstat` | Menampilkan informasi network state yang dapat direkonstruksi dari memory. | `vol -f Memory.raw windows.netstat`<br>Filter: `vol -f Memory.raw windows.netstat \| grep -i "ESTABLISHED"` |
+| `windows.orphan_kernel_threads` | Mencari kernel thread yang tampak orphan/tidak memiliki hubungan normal. | `vol -f Memory.raw windows.orphan_kernel_threads` |
+| `windows.pe_symbols` | Menampilkan/menganalisis PE symbols yang tersedia untuk executable/module. | `vol -f Memory.raw windows.pe_symbols` |
+| `windows.pedump` | Mengekstrak PE image/module dari memory. Berguna untuk mengambil executable/DLL untuk analisis lanjutan. | Dasar: `vol -f Memory.raw windows.pedump`<br>Output directory: `vol -f Memory.raw windows.pedump -D dumped_pe/` |
+| `windows.poolscanner` | Melakukan pool scan untuk menemukan objek kernel berdasarkan pool tag/signature. | `vol -f Memory.raw windows.poolscanner`<br>Filter: `vol -f Memory.raw windows.poolscanner \| grep -i "Process"` |
+| `windows.privileges` | Menampilkan privilege/token privilege yang dimiliki proses. | Dasar: `vol -f Memory.raw windows.privileges`<br>PID: `vol -f Memory.raw windows.privileges --pid 880` |
+| `windows.pslist` | Menampilkan proses yang terdaftar dalam process list Windows. | Dasar: `vol -f Memory.raw windows.pslist`<br>Filter: `vol -f Memory.raw windows.pslist \| grep -i "svchost"` |
+| `windows.psscan` | Melakukan scan memory untuk menemukan process objects, termasuk proses yang mungkin sudah keluar/tersembunyi dari list normal. | `vol -f Memory.raw windows.psscan`<br>Filter: `vol -f Memory.raw windows.psscan \| grep -i "rootkit"` |
+| `windows.pstree` | Menampilkan hubungan parent-child antar proses dalam bentuk tree. | Dasar: `vol -f Memory.raw windows.pstree`<br>Filter: `vol -f Memory.raw windows.pstree \| grep -i "cmd"` |
+| `windows.registry.amcache` | Menganalisis AmCache dari registry untuk artefact aplikasi/executable. | `vol -f Memory.raw windows.registry.amcache`<br>Filter: `vol -f Memory.raw windows.registry.amcache \| grep -i ".exe"` |
+| `windows.registry.cachedump` | Mengambil cached domain logon information dari registry memory artefacts. | `vol -f Memory.raw windows.registry.cachedump` |
+| `windows.registry.certificates` | Menampilkan certificate information yang ditemukan pada registry. | `vol -f Memory.raw windows.registry.certificates` |
+| `windows.registry.getcellroutine` | Menampilkan/menelusuri cell routine pada registry hive structures. | `vol -f Memory.raw windows.registry.getcellroutine` |
+| `windows.registry.hashdump` | Mengekstrak password hash dari registry SAM/SYSTEM bila artefact yang dibutuhkan tersedia. | `vol -f Memory.raw windows.registry.hashdump` |
+| `windows.registry.hivelist` | Menampilkan registry hive yang ditemukan dalam memory. | `vol -f Memory.raw windows.registry.hivelist` |
+| `windows.registry.hivescan` | Melakukan scan memory untuk menemukan registry hive structures. | `vol -f Memory.raw windows.registry.hivescan` |
+| `windows.registry.lsadump` | Mengekstrak informasi LSA secrets dari registry/memory artefacts. | `vol -f Memory.raw windows.registry.lsadump` |
+| `windows.registry.printkey` | Membaca registry key/value tertentu. | Dasar: `vol -f Memory.raw windows.registry.printkey`<br>Untuk key tertentu gunakan opsi path/key yang tersedia pada `vol ... windows.registry.printkey --help` |
+| `windows.registry.scheduled_tasks` | Menganalisis scheduled task yang tersimpan pada registry. | `vol -f Memory.raw windows.registry.scheduled_tasks`<br>Filter: `vol -f Memory.raw windows.registry.scheduled_tasks \| grep -i "task"` |
+| `windows.registry.userassist` | Menampilkan UserAssist artefacts yang dapat menunjukkan aktivitas aplikasi melalui registry. | Dasar: `vol -f Memory.raw windows.registry.userassist`<br>Filter: `vol -f Memory.raw windows.registry.userassist \| grep -i "Brave"` |
+| `windows.sessions` | Menampilkan session Windows yang ditemukan. | `vol -f Memory.raw windows.sessions` |
+| `windows.shimcachemem` | Menganalisis ShimCache/AppCompatCache data yang berada di memory. | `vol -f Memory.raw windows.shimcachemem`<br>Filter: `vol -f Memory.raw windows.shimcachemem \| grep -i ".exe"` |
+| `windows.ssdtscan` | Melakukan scan terhadap System Service Descriptor Table (SSDT). | `vol -f Memory.raw windows.ssdtscan` |
+| `windows.statistics` | Menampilkan statistik tertentu yang dapat dikumpulkan dari memory/kernel structures. | `vol -f Memory.raw windows.statistics` |
+| `windows.strings` | Mencari/memetakan string ke virtual address/process context. Berguna untuk menemukan URL, path, command, atau IOC. | Dasar: `vol -f Memory.raw windows.strings --strings-file strings.txt` jika opsi tersebut tersedia pada versi plugin.<br>Selalu cek: `vol ... windows.strings --help` |
+| `windows.suspended_threads` | Menampilkan thread yang berada dalam kondisi suspended. | `vol -f Memory.raw windows.suspended_threads` |
+| `windows.svclist` | Menampilkan Windows services yang ditemukan. | `vol -f Memory.raw windows.svclist`<br>Filter: `vol -f Memory.raw windows.svclist \| grep -i "service"` |
+| `windows.svcscan` | Melakukan scan memory untuk menemukan Windows services, termasuk artefact service yang mungkin tidak muncul dari enumerasi normal. | `vol -f Memory.raw windows.svcscan`<br>Filter: `vol -f Memory.raw windows.svcscan \| grep -i "svchost"` |
+| `windows.symlinkscan` | Melakukan scan untuk symbolic link objects Windows. | `vol -f Memory.raw windows.symlinkscan`<br>Filter: `vol -f Memory.raw windows.symlinkscan \| grep -i "link"` |
+| `windows.thrdscan` | Melakukan scan memory untuk menemukan thread objects. | `vol -f Memory.raw windows.thrdscan`<br>Filter: `vol -f Memory.raw windows.thrdscan \| grep "880"` |
+| `windows.threads` | Menampilkan thread yang terkait dengan proses. | Dasar: `vol -f Memory.raw windows.threads`<br>PID: `vol -f Memory.raw windows.threads --pid 880` |
+| `windows.timers` | Menampilkan kernel timers yang ditemukan. Berguna untuk investigasi aktivitas kernel tertentu. | `vol -f Memory.raw windows.timers` |
+| `windows.timedump` | Menampilkan timestamp/time-related dump information jika tersedia pada plugin/version yang digunakan. | `vol -f Memory.raw windows.timedump` |
+| `windows.unloadedmodules` | Menampilkan module yang sudah di-unload tetapi artefact-nya masih dapat ditemukan. Berguna untuk investigasi module yang pernah aktif. | `vol -f Memory.raw windows.unloadedmodules`<br>Filter: `vol -f Memory.raw windows.unloadedmodules \| grep -i ".sys"` |
+| `windows.vadinfo` | Menampilkan Virtual Address Descriptor (VAD) dan region virtual memory milik proses. | Dasar: `vol -f Memory.raw windows.vadinfo --pid 880`<br>Filter: `vol -f Memory.raw windows.vadinfo --pid 880 \| grep -i "PAGE_EXECUTE"` |
+| `windows.vadregexscan` | Mencari pola/regex pada VAD memory regions. | Cek opsi dulu: `vol -f Memory.raw windows.vadregexscan --help`<br>Lalu gunakan opsi regex/pattern yang disediakan versi plugin |
+| `windows.vadwalk` | Menelusuri struktur VAD tree suatu proses. | `vol -f Memory.raw windows.vadwalk --pid 880` |
+| `windows.vadyarascan` | Melakukan YARA scan terhadap VAD memory regions. | Dasar: `vol -f Memory.raw windows.vadyarascan --pid 880 --yara-rules rule.yar`<br>Nama opsi dapat berbeda menurut versi; cek `--help` |
+| `windows.verinfo` | Menampilkan version information dari PE/module yang ditemukan. | `vol -f Memory.raw windows.verinfo` |
+| `windows.virtmap` | Menampilkan virtual memory mapping yang ditemukan. | `vol -f Memory.raw windows.virtmap` |
+| `windows.windows` | Menampilkan window objects/window information yang ditemukan pada Windows GUI subsystem. | `vol -f Memory.raw windows.windows` |
+| `windows.windowstations` | Menampilkan Windows Window Station objects dan informasi terkait. | `vol -f Memory.raw windows.windowstations` |
 
 ## Pola penggunaan yang paling sering dipakai
 
 ### 1. Analisis satu PID
 
-``` bash
+```bash
 vol -f Memory.raw windows.dlllist --pid 880
 ```
 
 Pola:
 
-``` text
+```text
 vol -f <memory> <plugin> --pid <PID>
 ```
 
 Contoh plugin yang umum memakai pendekatan PID:
 
-``` text
+```text
 windows.dlllist
 windows.cmdline
 windows.envars
@@ -457,19 +144,19 @@ windows.vadwalk
 
 ### 2. Filter output dengan grep
 
-``` bash
+```bash
 vol -f Memory.raw windows.pslist | grep -i "svchost"
 ```
 
 Pola:
 
-``` text
+```text
 <command> | grep -i "<kata>"
 ```
 
 Contoh:
 
-``` bash
+```bash
 vol -f Memory.raw windows.netscan | grep -i "ESTABLISHED"
 vol -f Memory.raw windows.dlllist --pid 880 | grep -i "msxml"
 vol -f Memory.raw windows.filescan | grep -i "str.sys"
@@ -477,7 +164,7 @@ vol -f Memory.raw windows.filescan | grep -i "str.sys"
 
 ### 3. Melihat opsi lengkap plugin
 
-``` bash
+```bash
 vol -f Memory.raw windows.dlllist --help
 ```
 
@@ -487,19 +174,19 @@ Ini penting karena **opsi setiap plugin tidak selalu sama**.
 
 Untuk plugin yang memang mendukung directory output:
 
-``` bash
+```bash
 vol -f Memory.raw windows.dumpfiles -D dumped_files/
 ```
 
 atau:
 
-``` bash
+```bash
 vol -f Memory.raw windows.pedump -D dumped_pe/
 ```
 
 ## Alur belajar DFIR yang praktis
 
-``` text
+```text
 windows.info
       ↓
 windows.pslist / windows.pstree
@@ -527,7 +214,7 @@ windows.dumpfiles / windows.pedump
 
 ### Contoh hubungan dengan kasus PID 880
 
-``` text
+```text
 pslist
   ↓
 PID 880 svchost.exe
@@ -543,7 +230,4 @@ msxml3r.dll = False / False / False
 indikasi DLL unlinked/hidden
 ```
 
-> **Catatan:** daftar di atas mengikuti command yang tampak pada
-> screenshot. Untuk opsi command yang spesifik, terutama plugin
-> malware/YARA/registry yang berubah antarversi Volatility 3, gunakan
-> `--help` pada versi yang sedang dipakai.
+> **Catatan:** daftar di atas mengikuti command yang tampak pada screenshot. Untuk opsi command yang spesifik, terutama plugin malware/YARA/registry yang berubah antarversi Volatility 3, gunakan `--help` pada versi yang sedang dipakai.
